@@ -1,7 +1,8 @@
 #include "parser.hpp"
 #include "mergesort.hpp"
 #include "binary_search.hpp"
-
+#include "graph.hpp"
+#include "kruskal.hpp"
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -12,10 +13,9 @@
 #include <cmath>
 #include <filesystem>
 
-
+//Modulo A: Divide y Vencerás
 using Clock = std::chrono::high_resolution_clock;
 using Ms    = std::chrono::duration<double, std::milli>;
-
 
 double medirTiempoSort(const std::vector<Solicitud>& base, int n) {
     std::vector<Solicitud> copia(base.begin(), base.begin() + n);
@@ -24,8 +24,6 @@ double medirTiempoSort(const std::vector<Solicitud>& base, int n) {
     auto t1 = Clock::now();
     return Ms(t1 - t0).count();
 }
-
-
 void escribirOrdenadas(const std::vector<Solicitud>& arr, const std::string& ruta) {
     std::ofstream f(ruta);
     f << "customerID,tenure,MonthlyCharges,TotalCharges,Churn\n";
@@ -38,22 +36,16 @@ void escribirOrdenadas(const std::vector<Solicitud>& arr, const std::string& rut
           << (s.churn ? "Yes" : "No") << "\n";
     }
 }
-
-
-
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         std::cerr << "Uso: " << argv[0]
                   << " data/WA_Fn-UseC_-Telco-Customer-Churn.csv\n";
         return 1;
     }
-
     const std::string rutaCSV = argv[1];
-
 
     std::filesystem::create_directories("results");
 
-  
     std::cout << "=== Módulo A — Divide y Vencerás ===\n\n";
     std::cout << "[A1] Parseando CSV: " << rutaCSV << " ...\n";
 
@@ -74,7 +66,6 @@ int main(int argc, char* argv[]) {
     }
     std::cout << "  Registros con Churn = No (activos): " << activos  << "\n";
     std::cout << "  Registros con Churn = Yes (riesgo): " << enRiesgo << "\n\n";
-
     
     std::cout << "[A2] Ordenando por tenure descendente con MergeSort...\n";
 
@@ -88,12 +79,10 @@ int main(int argc, char* argv[]) {
               << std::fixed << std::setprecision(2) << tiempoCompleto << " ms\n";
     std::cout << "  tenure[0]    (mayor) = " << solicitudes.front().tenure << "\n";
     std::cout << "  tenure[last] (menor) = " << solicitudes.back().tenure  << "\n\n";
-
     
     escribirOrdenadas(solicitudes, "results/solicitudes_ordenadas.csv");
     std::cout << "  -> results/solicitudes_ordenadas.csv generado.\n\n";
 
-    
     std::cout << "[A4] Analisis empirico de tiempos:\n";
 
     int tamanios[] = {1000, 3500, 7043};
@@ -107,7 +96,6 @@ int main(int argc, char* argv[]) {
         }
         tiempos[i] = suma / 5.0;
     }
-
     std::cout << "  +----------+------------+------------------+\n";
     std::cout << "  |    n     | Tiempo(ms) | n*log2(n) (norm) |\n";
     std::cout << "  +----------+------------+------------------+\n";
@@ -121,8 +109,6 @@ int main(int argc, char* argv[]) {
                   << " | " << std::setw(16) << std::setprecision(4) << ratio << " |\n";
     }
     std::cout << "  +----------+------------+------------------+\n\n";
-
-   
     std::cout << "[A3] Busqueda binaria recursiva — 5 consultas:\n";
 
     struct Consulta { std::string id; int k; };
@@ -133,7 +119,6 @@ int main(int argc, char* argv[]) {
         {"Q_A04", 30},
         {"Q_A05", 12}
     };
-
     std::ofstream fBusq("results/busquedas_A.txt");
     fBusq << "Resultados de busqueda binaria recursiva\n";
     fBusq << "Arreglo ordenado por tenure DESCENDENTE\n";
@@ -174,10 +159,37 @@ int main(int argc, char* argv[]) {
               << std::setw(8)  << tenureS
               << churnS << "\n";
     }
-
     fBusq.close();
     std::cout << "\n  -> results/busquedas_A.txt generado.\n\n";
     std::cout << " Modulo A completado \n";
+
+
+    //Modulo B - Algoritmo Codicioso Kruskal
+    std::cout <<"\n\n=== Modulo B - Algoritmo Codicioso (Kruskal) ===\n\n";
+
+    std::cout<<"[B1] Construyendo grafo K_20...\n";
+    Grafo grafo= construirGrafo(solicitudes);
+    std::cout<<"Nodos   : "<< grafo.numNodos << "\n";
+    std::cout<<"Aristas : " << grafo.numAristas << "\n\n";
+
+    std::cout<< "[B2] Ejecutando Kruskal...\n";
+    ResultadoMST mst= kruskal(grafo);
+    std::cout<< "Aristas en el MST : "<< mst.aristas.size() << "\n";
+    std::cout<< "Peso total del MST: "<< std::fixed << std::setprecision(2) << mst.pesoTotal << "\n\n";
+
+    //Escribe los resultados en mst_red.txt
+    std::ofstream fMST("results/mst_red.txt");
+    fMST<<"Aristas del MST (Kruskal)\n";
+    fMST<<"Peso total: "<< std::fixed << std::setprecision(2) << mst.pesoTotal << "\n\n";
+    fMST<<std::left << std::setw(6) << "u"<< std::setw(6)<< "v" << "peso\n";
+    fMST<<std::string(20,'-') << "\n";
+    for (const Arista& a : mst.aristas) {
+        fMST << std::setw(6)<< a.u << std::setw(6)<< a.v << a.peso<< "\n";
+    }
+    fMST.close();
+    std::cout << "-> results/mst_red.txt generado.\n\n";
+    std::cout << "Modulo B completado\n\n";
+
 
     return 0;
 }
