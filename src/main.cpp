@@ -1,3 +1,4 @@
+#include "knapsack.hpp"
 #include "parser.hpp"
 #include "mergesort.hpp"
 #include "binary_search.hpp"
@@ -226,6 +227,90 @@ int main(int argc, char* argv[]) {
     std::cout<<"-> results/mst_red.txt generado.\n\n";
     std::cout<<"Modulo B completado\n\n";
 
+//Modulo C - Programacion Dinamica (Mochila 0-1)
+    std::cout << "\n\n=== Modulo C - Programacion Dinamica (Mochila 0-1) ===\n\n";
+
+    const int capacidad = 500;
+
+    std::cout << "[C1] Preparando items: 50 solicitudes activas de mayor antiguedad...\n";
+    std::vector<ItemMochila> items = prepararItems(solicitudes);
+    std::cout << "  Items preparados : " << items.size() << "\n";
+    std::cout << "  Capacidad W      : " << capacidad << "\n\n";
+
+    std::cout << "[C2] Ejecutando Mochila 0-1 por tabulacion (51 x 501)...\n";
+    auto inicioPD = Clock::now();
+    ResultadoMochila resultadoPD = mochila01(items, capacidad);
+    auto finPD = Clock::now();
+    double tiempoPD = Ms(finPD - inicioPD).count();
+
+    std::cout << "  Tiempo                    : " << std::fixed << std::setprecision(2) << tiempoPD << " ms\n";
+    std::cout << "  Valor optimo (USD)        : " << std::fixed << std::setprecision(2) << resultadoPD.valorOptimo << "\n";
+    std::cout << "  Peso utilizado            : " << resultadoPD.pesoUsado << " / " << capacidad << "\n";
+    std::cout << "  Solicitudes seleccionadas : " << resultadoPD.seleccionados.size() << " / " << items.size() << "\n\n";
+
+    std::cout << "[C3] Comparando con enfoque codicioso (ratio v/w)...\n";
+    ResultadoGreedy resultadoCodicioso = mochilaCodiciosa(items, capacidad);
+    std::cout << "  Codicioso valor total : " << std::fixed << std::setprecision(2) << resultadoCodicioso.valorTotal << "\n";
+    std::cout << "  Codicioso peso usado  : " << resultadoCodicioso.pesoUsado << " / " << capacidad << "\n";
+    std::cout << "  Codicioso items       : " << resultadoCodicioso.seleccionados.size() << "\n";
+    std::cout << "  Diferencia vs PD      : " << std::fixed << std::setprecision(2)
+              << (resultadoCodicioso.valorTotal - resultadoPD.valorOptimo) << " USD\n\n";
+
+    // Escribe los resultados en mochila_C.txt
+    std::ofstream fMochila("results/mochila_C.txt");
+    fMochila << "=== Modulo C - Mochila 0-1 (Programacion Dinamica) ===\n\n";
+    fMochila << "Capacidad W   : " << capacidad << "\n";
+    fMochila << "Items totales : " << items.size() << "\n\n";
+
+    fMochila << "--- Resultado optimo (Programacion Dinamica) ---\n";
+    fMochila << "Valor optimo (USD): " << std::fixed << std::setprecision(2) << resultadoPD.valorOptimo << "\n";
+    fMochila << "Peso utilizado    : " << resultadoPD.pesoUsado << " / " << capacidad << "\n";
+    fMochila << "Items elegidos    : " << resultadoPD.seleccionados.size() << "\n\n";
+
+    fMochila << "--- Solicitudes seleccionadas ---\n";
+    fMochila << std::left
+             << std::setw(14) << "customerID"
+             << std::setw(8)  << "tenure"
+             << std::setw(8)  << "peso"
+             << std::setw(12) << "valor"
+             << "ratio v/w\n";
+    fMochila << std::string(50, '-') << "\n";
+    for (int idx : resultadoPD.seleccionados) {
+        const ItemMochila& item = items[idx];
+        double ratio = item.valor / (double)item.peso;
+        fMochila << std::setw(14) << item.customerID
+                 << std::setw(8)  << item.tenure
+                 << std::setw(8)  << item.peso
+                 << std::setw(12) << std::fixed << std::setprecision(2) << item.valor
+                 << std::fixed << std::setprecision(3) << ratio << "\n";
+    }
+
+    fMochila << "\n--- Comparacion con enfoque codicioso ---\n";
+    fMochila << "PD        : " << std::fixed << std::setprecision(2) << resultadoPD.valorOptimo
+             << " USD (" << resultadoPD.pesoUsado << "/" << capacidad
+             << ", " << resultadoPD.seleccionados.size() << " items)\n";
+    fMochila << "Codicioso : " << std::fixed << std::setprecision(2) << resultadoCodicioso.valorTotal
+             << " USD (" << resultadoCodicioso.pesoUsado << "/" << capacidad
+             << ", " << resultadoCodicioso.seleccionados.size() << " items)\n";
+    fMochila << "Diferencia: " << std::fixed << std::setprecision(2)
+             << (resultadoCodicioso.valorTotal - resultadoPD.valorOptimo) << " USD\n\n";
+
+    fMochila << "--- Contraejemplo abstracto (W = 10) ---\n";
+    fMochila << "Item A: peso=6, valor=10, ratio=1.667\n";
+    fMochila << "Item B: peso=5, valor=8,  ratio=1.600\n";
+    fMochila << "Item C: peso=5, valor=8,  ratio=1.600\n";
+    fMochila << "Codicioso: toma A (mejor ratio); cap residual=4 < 5, no cabe B ni C => valor=10\n";
+    fMochila << "PD       : toma B+C => valor=16 (60% mejor que el codicioso)\n";
+    fMochila << "Conclusion: la Mochila 0-1 NO posee la propiedad de eleccion codiciosa.\n\n";
+
+    fMochila << "--- Pseudopolinomialidad ---\n";
+    fMochila << "Complejidad O(n*W) = " << (long long)items.size() * (capacidad + 1) << " operaciones.\n";
+    fMochila << "W=500 codificado en b=ceil(log2(500))=9 bits => O(n*2^b) exponencial en tamanio de entrada.\n";
+    fMochila.close();
+
+    std::cout << "  -> results/mochila_C.txt generado.\n\n";
+    std::cout << "Modulo C completado\n\n";
 
     return 0;
+    
 }

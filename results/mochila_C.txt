@@ -1,0 +1,41 @@
+=== Modulo C - Mochila 0-1 (Programacion Dinamica) ===
+
+Capacidad W   : 500
+Items totales : 50
+
+--- Resultado optimo (Programacion Dinamica) ---
+Valor optimo (USD): 718.10
+Peso utilizado    : 500 / 500
+Items elegidos    : 11
+
+--- Solicitudes seleccionadas ---
+customerID    tenure  peso    valor       ratio v/w
+--------------------------------------------------
+5248-YGIJN    72      63      90.25       1.433
+0526-SXDJP    72      29      42.10       1.452
+6728-DKUCO    72      73      104.15      1.427
+5997-OPVFA    72      62      89.05       1.436
+9286-BHDQG    72      31      45.25       1.460
+9880-TDQAC    72      42      60.00       1.429
+7606-BPHHN    72      14      19.80       1.414
+3649-JPUGY    72      62      88.60       1.429
+4723-BEGSG    72      60      86.65       1.444
+4312-KFRXN    72      17      25.40       1.494
+1266-NZYUI    72      47      66.85       1.422
+
+--- Comparacion con enfoque codicioso ---
+PD        : 718.10 USD (500/500, 11 items)
+Codicioso : 717.70 USD (499/500, 11 items)
+Diferencia: -0.40 USD
+
+--- Contraejemplo abstracto (W = 10) ---
+Item A: peso=6, valor=10, ratio=1.667
+Item B: peso=5, valor=8,  ratio=1.600
+Item C: peso=5, valor=8,  ratio=1.600
+Codicioso: toma A (mejor ratio); cap residual=4 < 5, no cabe B ni C => valor=10
+PD       : toma B+C => valor=16 (60% mejor que el codicioso)
+Conclusion: la Mochila 0-1 NO posee la propiedad de eleccion codiciosa.
+
+--- Pseudopolinomialidad ---
+Complejidad O(n*W) = 25050 operaciones.
+W=500 codificado en b=ceil(log2(500))=9 bits => O(n*2^b) exponencial en tamanio de entrada.
