@@ -9,24 +9,23 @@
 ## Estructura del repositorio
 
 ```
-Practica-Final-Integradora-ADA-2026-01/
-├── .gitignore
-├── README.MD
+ADA_PF_Velasquez_Sanabria_Murillo_Rodriguez/
+├── README.md
 ├── data/
 │   └── WA_Fn-UseC_-Telco-Customer-Churn.csv
 ├── results/
-│   ├── solicitudes_ordenadas.csv        ← Módulo A
-│   ├── busquedas_A.txt                  ← Módulo A
-│   ├── mst_red.txt                      ← Módulo B
-│   └── asignacion_bw.txt                ← Módulo C (pendiente)
+│   ├── solicitudes_ordenadas.csv        Módulo A: registros ordenados por tenure
+│   ├── busquedas_A.txt                  Módulo A: resultados de las 5 consultas
+│   ├── mst_red.txt                      Módulo B: aristas del MST y peso total
+│   └── asignacion_bw.txt                Módulo C: solución óptima y contraejemplo
 ├── src/
-│   ├── parser.hpp / parser.cpp          ← Módulo A: parseo CSV
-│   ├── mergesort.hpp / mergesort.cpp    ← Módulo A: MergeSort
-│   ├── binary_search.hpp / binary_search.cpp ← Módulo A: búsqueda binaria
-│   ├── graph.hpp / graph.cpp            ← Módulo B: grafo K_20
-│   ├── kruskal.hpp / kruskal.cpp        ← Módulo B: Kruskal + Union-Find
-│   ├── knapsack.hpp / knapsack.cpp      ← Módulo C (pendiente)
-│   └── main.cpp                         ← orquestador del pipeline
+│   ├── parser.cpp / parser.hpp          Lectura y parseo del CSV
+│   ├── mergesort.cpp / mergesort.hpp
+│   ├── binary_search.cpp / binary_search.hpp
+│   ├── graph.cpp / graph.hpp            Grafo ponderado y Union-Find
+│   ├── kruskal.cpp / kruskal.hpp
+│   ├── knapsack.cpp / knapsack.hpp
+│   └── main.cpp                         Orquestador del pipeline completo
 └── report/
     └── Informe.pdf
 ```
