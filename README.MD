@@ -33,10 +33,8 @@ ADA_PF_Velasquez_Sanabria_Murillo_Rodriguez/
 ## Compilación
 
 ```bash
-g++ -std=c++17 -O2 -o ada_pf src/main.cpp src/parser.cpp src/mergesort.cpp src/binary_search.cpp src/graph.cpp src/kruskal.cpp
+g++ -std=c++17 -O2 -o ada_pf src/main.cpp src/parser.cpp src/mergesort.cpp src/binary_search.cpp src/graph.cpp src/kruskal.cpp src/knapsack.cpp
 ```
-
-> Cuando se agregue el Módulo C, añadir `src/knapsack.cpp` al comando.
 
 ## Ejecución
 
